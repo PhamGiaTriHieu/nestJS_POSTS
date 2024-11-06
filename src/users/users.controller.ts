@@ -10,14 +10,17 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   UseGuards,
+  // Request,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 import { AuthService } from 'src/users/auth.service';
+import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
 import { LoginUserDto } from 'src/users/dtos/loginUser.dto';
 // import { CreateUserDto } from 'src/users/dtos/createUser.dto';
 import { RegisterUserDto } from 'src/users/dtos/registerUser.dto';
 import { UpdateUserDto } from 'src/users/dtos/updateUser.dto';
+import { Users } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('/api/v1/users')
@@ -40,6 +43,20 @@ export class UsersController {
     console.log('second interceptor called');
     // Implement fetching all users
     return this.userService.findAll();
+  }
+
+  // // cach 1
+  // @Get('current-user')
+  // @UseGuards(AuthGuard)
+  // getCurrentUser(@Request() req) {
+  //   return this.authService.getCurrentUser(req);
+  // }
+
+  // cach 2: using custom decorator
+  @Get('current-user')
+  @UseGuards(AuthGuard)
+  getCurrentUser(@CurrentUser() currentUser: Users) {
+    return currentUser;
   }
 
   @Get(':id')
