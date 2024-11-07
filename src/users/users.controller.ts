@@ -12,7 +12,8 @@ import {
   UseGuards,
   // Request,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { RoleGuard } from 'src/guards/role.guard';
 import { LoggingInterceptor } from 'src/interceptors/logging.interceptor';
 import { AuthService } from 'src/users/auth.service';
 import { CurrentUser } from 'src/users/decorators/currentUser.decorator';
@@ -38,9 +39,9 @@ export class UsersController {
   // }
 
   @Get()
+  @UseGuards(new RoleGuard(['user', 'admin']))
   @UseGuards(AuthGuard)
   getAllUsers() {
-    console.log('second interceptor called');
     // Implement fetching all users
     return this.userService.findAll();
   }
@@ -55,6 +56,7 @@ export class UsersController {
   // cach 2: using custom decorator
   @Get('current-user')
   @UseGuards(AuthGuard)
+  // @UseGuards(RoleGuard)
   getCurrentUser(@CurrentUser() currentUser: Users) {
     return currentUser;
   }
@@ -66,16 +68,24 @@ export class UsersController {
   }
 
   @Put(':id')
+  @UseGuards(new RoleGuard(['user', 'admin', 'mod']))
+  @UseGuards(AuthGuard)
   updateUserById(
     @Param('id', ParseIntPipe) id: number,
     @Body() requestBody: UpdateUserDto,
+    @CurrentUser() currentUser: Users,
   ) {
-    return this.userService.updateById(id, requestBody);
+    return this.userService.updateById(id, requestBody, currentUser);
   }
   @Delete(':id')
-  deleteUserById(@Param('id', ParseIntPipe) id: number) {
+  @UseGuards(new RoleGuard(['user', 'admin', 'mod']))
+  @UseGuards(AuthGuard)
+  deleteUserById(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() currentUser: Users,
+  ) {
     // Implement deleting a user by ID
-    this.userService.deleteById(id);
+    this.userService.deleteById(id, currentUser);
   }
 
   @Post('register')
