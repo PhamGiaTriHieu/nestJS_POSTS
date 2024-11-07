@@ -1,6 +1,6 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LoggerMiddleware } from 'src/middlewares/logging.middleware';
+
 import { AuthService } from 'src/users/auth.service';
 import { Users } from 'src/users/user.entity';
 import { UsersController } from 'src/users/users.controller';
@@ -18,8 +18,9 @@ import { JwtModule } from '@nestjs/jwt';
   providers: [UsersService, AuthService],
   controllers: [UsersController],
 })
-export class UsersModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
-  }
-}
+// export class UsersModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(LoggerMiddleware).forRoutes('*');
+//   }
+// }
+export class UsersModule {}
